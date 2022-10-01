@@ -1,8 +1,9 @@
 import { useState } from "react";
 import CurrencyInput from "react-currency-input-field";
-import { FormikContext, useFormik } from "formik";
+import { useFormik } from "formik";
 import axios from "axios";
 import * as Yup from "yup";
+import { CurrencyFormatter } from "utils";
 
 interface ICryptoOptions {
   id: string;
@@ -10,7 +11,10 @@ interface ICryptoOptions {
 }
 interface IPriceInfo extends ICryptoOptions {
   locale: string;
-  price: number;
+  profit: number;
+  previousPrice: number;
+  currentPrice: number;
+  totalMade: number;
 }
 interface ICurrencyOptions {
   abbreviation: string;
@@ -90,7 +94,7 @@ export function CurrencyInputForm() {
     validationSchema: validationSchema,
     async onSubmit(values, actions) {
       // grap data & fix up date for API
-      const { currency, cryptoType, selectedDate } = values;
+      const { currency, currencyType, cryptoType, selectedDate } = values;
       const [year, month, day] = selectedDate.split("-");
       const formattedDate = `${day}-${month}-${year}`;
 
@@ -99,17 +103,9 @@ export function CurrencyInputForm() {
         timeout: 5000,
       });
 
-      // get history
-      const data = await AInstance.get(`/coins/${cryptoType}/history`, {
-        params: { date: formattedDate },
-      })
-        .then((res) => {
-          return res.data;
-        })
-        .then((data) => {
-          // const priceData: IPriceInfo = {id: data.id, symbol: data.symbol, locale: }
-          setPriceData(data);
-        })
+      // get API data
+      const currentDataResp = await AInstance.get(`/coins/${cryptoType}`)
+        .then((res) => res.data)
         .catch((err) => {
           if (err.response) {
             console.log(err.response.status);
@@ -119,6 +115,69 @@ export function CurrencyInputForm() {
             console.log("Error", err.message);
           }
         });
+      const previousDataResp = await AInstance.get(
+        `/coins/${cryptoType}/history`,
+        {
+          params: { date: formattedDate },
+        }
+      )
+        .then((res) => res.data)
+        .catch((err) => {
+          if (err.response) {
+            console.log(err.response.status);
+          } else if (err.request) {
+            console.log(err.request);
+          } else {
+            console.log("Error", err.message);
+          }
+        });
+
+      // Get prices of crypto
+      const previousCryptoPrice = Number(
+          previousDataResp["market_data"]["current_price"][currencyType]
+        ),
+        currentCryptoPrice = Number(
+          currentDataResp["market_data"]["current_price"][currencyType]
+        );
+
+      // calculate holdings in crypto
+      const currentCryptoHeld = Number(currency) / currentCryptoPrice,
+        previousCryptoHeld = Number(currency) / previousCryptoPrice;
+
+      // calculate profit
+      const cryptoProfit = currentCryptoHeld - previousCryptoHeld,
+        totalCryptoMade = cryptoProfit + currentCryptoHeld,
+        currencyProfit = currentCryptoPrice * cryptoProfit,
+        totalCurrencyMade = currentCryptoPrice * totalCryptoMade;
+
+      console.log(
+        previousCryptoPrice,
+        currentCryptoPrice,
+        previousCryptoHeld,
+        currentCryptoHeld,
+        cryptoProfit,
+        currencyProfit,
+        totalCryptoMade,
+        totalCurrencyMade
+      );
+
+      // store price data in object according to interface shape
+      const priceData: IPriceInfo = {
+        id: cryptoType,
+        symbol: currencyInputOptions.reduce((prev, val) => {
+          if (val.abbreviation == currencyType) {
+            return val.symbol;
+          }
+          return prev;
+        }, ""),
+        locale: currencyType,
+        previousPrice: previousCryptoPrice,
+        currentPrice: currentCryptoPrice,
+        profit: currencyProfit,
+        totalMade: totalCurrencyMade,
+      };
+      // update state
+      setPriceData(priceData);
     },
   });
 
@@ -206,7 +265,14 @@ export function CurrencyInputForm() {
           )}
         </div>
       </form>
-      {priceData && <div>Price stuf fhere</div>}
+      {priceData && (
+        <div>
+          {priceData.id} {priceData.locale}{" "}
+          {CurrencyFormatter(priceData.locale, priceData.profit)}{" "}
+          {priceData.symbol}{" "}
+          {CurrencyFormatter(priceData.locale, priceData.totalMade)}
+        </div>
+      )}
     </div>
   );
 }
