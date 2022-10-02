@@ -76,7 +76,6 @@ const currencyInputOptions: ICurrencyOptions[] = [
 const validationSchema = Yup.object().shape({
   currency: Yup.number()
     .required("*required")
-    .min(1000, "*required")
     .positive(),
   currencyType: Yup.string()
     .required("*required")
@@ -89,6 +88,7 @@ const validationSchema = Yup.object().shape({
     .oneOf(cryptoInputOptions.map((val) => val.id)),
   selectedDate: Yup.date()
     .required("*required")
+    .min(new Date('2013-05-02').toLocaleDateString(), "date must be after")
     .max(new Date().toLocaleDateString(), "date must be earlier"),
 });
 
