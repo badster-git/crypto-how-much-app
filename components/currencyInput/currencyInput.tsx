@@ -333,7 +333,7 @@ export function CurrencyInputForm() {
             </div>
           </div>
         </div>
-        <div className="md:flex mb-8">
+        <div className="md:flex mb-2">
           <div className="md:w-1/3">
             <legend className="uppercase tracking-wide text-sm">Why?</legend>
             <p className="text-xs font-light md:w-[15rem] mt-2">
@@ -350,7 +350,8 @@ export function CurrencyInputForm() {
                     {priceData?.amountBought}{" "}
                   </span>
                   of {priceData.id} on {priceData.dateBought} you would have
-                  around <span id="totalMade">{priceData?.totalMade}</span> right now.
+                  around <span id="totalMade">{priceData?.totalMade}</span>{" "}
+                  right now.
                 </p>
 
                 <p className="text-md font-light">
@@ -358,6 +359,14 @@ export function CurrencyInputForm() {
                 </p>
               </div>
             )}
+          </div>
+        </div>
+        <div className="md:flex mb-8">
+          <div className="md:w-1/3">
+            <legend className="uppercase tracking-wide text-sm">How?</legend>
+            <p className="text-xs font-light md:w-[15rem] mt-2">
+              This was made using the CoinGeicko API as well as Next.JS.
+            </p>
           </div>
         </div>
       </form>
