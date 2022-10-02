@@ -1,10 +1,7 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import Image from "next/image";
-import { InputForm } from "components/inputForm/inputForm";
 import { CurrencyInputForm } from "components/currencyInput/currencyInput";
 import { Footer } from "components/footer/footer";
-import styles from "../styles/Home.module.css";
 
 const Home: NextPage = () => {
   return (

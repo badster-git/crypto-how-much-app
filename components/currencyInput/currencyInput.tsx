@@ -161,17 +161,6 @@ export function CurrencyInputForm() {
         currencyProfit = currentCryptoPrice * cryptoProfit,
         totalCurrencyMade = currentCryptoPrice * totalCryptoMade;
 
-      console.log(
-        previousCryptoPrice,
-        currentCryptoPrice,
-        previousCryptoHeld,
-        currentCryptoHeld,
-        cryptoProfit,
-        currencyProfit,
-        totalCryptoMade,
-        totalCurrencyMade
-      );
-
       // store price data in object according to interface shape
       const priceData: IPriceInfo = {
         id: cryptoType,
