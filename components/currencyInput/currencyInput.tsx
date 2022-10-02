@@ -193,7 +193,7 @@ export function CurrencyInputForm() {
               What is this?
             </legend>
             <p className="text-xs font-light md:w-[15rem] mt-2">
-              Checks potential profits you could've made if you'd had invested
+              Checks potential profits you could've made if you&apos;d had invested
               in a coin at a certain date.
             </p>
           </div>
